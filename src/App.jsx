@@ -10,21 +10,21 @@ function App() {
     fetchNotes()
   }, [])
 
-  async function fetchNotes() {
-    const response = await fetch('${API_URL}/api/notes')
-    const data = await response.json()
-    setNotes(data)
-  }
+async function fetchNotes() {
+  const response = await fetch(`${API_URL}/api/notes`)
+  const data = await response.json()
+  setNotes(data)
+}
 
-  async function createNote(title, content) {
-    if (!title) return alert('Title is required')
-    await fetch('${API_URL}/api/notes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, content })
-    })
-    fetchNotes()
-  }
+async function createNote(title, content) {
+  if (!title) return alert('Title is required')
+  await fetch(`${API_URL}/api/notes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, content })
+  })
+  fetchNotes()
+}
 
   async function deleteNote(id) {
     await fetch(`${API_URL}/api/notes/${id}`, {
@@ -43,17 +43,35 @@ function App() {
     fetchNotes()
   }
 
-  return (
-    <div className="max-w-2xl mx-auto mt-10 px-4">
-      <h1 className="text-3xl font-bold mb-6">My Notes</h1>
-      <NoteForm onSave={createNote} />
-      <NoteList
-        notes={notes}
-        onDelete={deleteNote}
-        onEdit={(note) => setEditingNote(note)}
-      />
-    </div>
-  )
+return (
+  <div className="max-w-2xl mx-auto mt-10 px-4">
+    <h1 className="text-3xl font-bold mb-6">My Notes</h1>
+    <NoteForm onSave={createNote} />
+
+    {editingNote && (
+      <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-6">
+        <h2 className="font-semibold mb-3">Editing Note</h2>
+        <NoteForm
+          initialTitle={editingNote.title}
+          initialContent={editingNote.content}
+          onSave={(title, content) => updateNote(editingNote.id, title, content)}
+        />
+        <button
+          onClick={() => setEditingNote(null)}
+          className="text-sm text-gray-500 mt-2 cursor-pointer"
+        >
+          Cancel
+        </button>
+      </div>
+    )}
+
+    <NoteList
+      notes={notes}
+      onDelete={deleteNote}
+      onEdit={(note) => setEditingNote(note)}
+    />
+  </div>
+)
 }
 
 export default App
